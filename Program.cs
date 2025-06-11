@@ -1,0 +1,115 @@
+using AuthorizationService;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
+using OpenIddict.Server.AspNetCore;
+using OpenIddict.Validation.AspNetCore;
+// using AuthorizationService.Data;
+// using AuthorizationService.Models;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// ---------- ĐỌC CHUỖI KẾT NỐI ----------
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// ---------- DATABASE & IDENTITY ----------
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(connectionString);
+    options.UseOpenIddict(); // EF Core integration cho OpenIddict
+});
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredUniqueChars = 1;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// ---------- OPENIDDICT CONFIGURATION ----------
+builder.Services.AddOpenIddict()
+    .AddCore(options =>
+    {
+        options.UseEntityFrameworkCore()
+               .UseDbContext<ApplicationDbContext>();
+    })
+    .AddServer(options =>
+    {
+        options.SetTokenEndpointUris("/connect/token");
+
+        options.AllowPasswordFlow();
+        options.AllowRefreshTokenFlow();
+        options.AcceptAnonymousClients();
+
+        options.AddEphemeralEncryptionKey()
+               .AddEphemeralSigningKey();
+
+        options.UseAspNetCore()
+               .EnableTokenEndpointPassthrough();
+    })
+    .AddValidation(options =>
+    {
+        options.UseLocalServer();
+        options.UseAspNetCore();
+    });
+var emailSettings = builder.Configuration
+    .GetSection("EmailSettings")
+    .Get<EmailSettings>();
+
+builder.Services.AddSingleton(emailSettings);
+builder.Services.AddScoped<EmailService>();
+
+// ---------- AUTHENTICATION ----------
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+});
+
+// ---------- AUTHORIZATION ----------
+builder.Services.AddAuthorization();
+
+// ---------- CONTROLLERS / SWAGGER ----------
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+// ---------- APPLY MIGRATIONS + TẠO ROLE MẶC ĐỊNH ----------
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    string[] roles = { "User", "Admin" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
+
+// ---------- MIDDLEWARE PIPELINE ----------
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
