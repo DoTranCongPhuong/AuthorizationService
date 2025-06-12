@@ -37,21 +37,21 @@ builder.Services.AddOpenIddict()
     .AddCore(options =>
     {
         options.UseEntityFrameworkCore()
-               .UseDbContext<ApplicationDbContext>(); // Kết nối EF Core
+               .UseDbContext<ApplicationDbContext>();
     })
     .AddServer(options =>
     {
-        // Bạn cần cả khóa mã hóa và khóa ký.
-        options.AddDevelopmentEncryptionCertificate();  // Khóa mã hóa (UNCOMMENT THIS LINE)
-        options.AddDevelopmentSigningCertificate();     // Khóa ký
 
-        // Endpoint & luồng xác thực
+        options.AddEphemeralEncryptionKey();
+
+        // ✅ Dùng khóa ký JWT
+        options.AddDevelopmentSigningCertificate();
+        options.DisableAccessTokenEncryption();
         options.SetTokenEndpointUris("/connect/token");
         options.AllowPasswordFlow();
-        options.AllowRefreshTokenFlow();
+        options.AllowRefreshTokenFlow(); 
         options.AcceptAnonymousClients();
 
-        // Cho phép dùng controller tùy chỉnh
         options.UseAspNetCore()
                .EnableTokenEndpointPassthrough();
     })
@@ -63,14 +63,14 @@ builder.Services.AddOpenIddict()
 
 
 
+
+
 // ✅ Set cứng: Cho phép HTTP mà không cần kiểm tra môi trường
 builder.Services.Configure<OpenIddictServerAspNetCoreOptions>(options =>
 {
     options.DisableTransportSecurityRequirement = true;
 }
 );
-
-
 
 
 var emailSettings = builder.Configuration
