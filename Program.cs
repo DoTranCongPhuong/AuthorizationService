@@ -49,7 +49,7 @@ builder.Services.AddOpenIddict()
         options.DisableAccessTokenEncryption();
         options.SetTokenEndpointUris("/connect/token");
         options.AllowPasswordFlow();
-        options.AllowRefreshTokenFlow(); 
+        options.AllowRefreshTokenFlow();
         options.AcceptAnonymousClients();
 
         options.UseAspNetCore()
@@ -96,6 +96,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseAuthentication();
+app.UseAuthorization();
 // ---------- APPLY MIGRATIONS + TẠO ROLE MẶC ĐỊNH ----------
 using (var scope = app.Services.CreateScope())
 {
@@ -123,8 +125,6 @@ if (app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection(); - http
 
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 

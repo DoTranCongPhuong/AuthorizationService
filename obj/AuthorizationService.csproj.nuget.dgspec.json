@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\AuthorizationService.csproj": {}
+    "c:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\AuthorizationService.csproj": {}
   },
   "projects": {
-    "C:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\AuthorizationService.csproj": {
+    "c:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\AuthorizationService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\AuthorizationService.csproj",
+        "projectUniqueName": "c:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\AuthorizationService.csproj",
         "projectName": "AuthorizationService",
-        "projectPath": "C:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\AuthorizationService.csproj",
+        "projectPath": "c:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\AuthorizationService.csproj",
         "packagesPath": "C:\\Users\\acer\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\obj\\",
+        "outputPath": "c:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

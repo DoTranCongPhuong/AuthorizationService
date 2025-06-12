@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "PBoj7QyrA8Y=",
+  "dgSpecHash": "3HFnPFRUXlg=",
   "success": true,
-  "projectFilePath": "C:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\AuthorizationService.csproj",
+  "projectFilePath": "c:\\Users\\acer\\Desktop\\THLOne\\MicroserviceDemo\\AuthorizationService\\AuthorizationService.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\acer\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
