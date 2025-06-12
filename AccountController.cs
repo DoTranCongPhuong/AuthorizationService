@@ -147,14 +147,11 @@ public class AccountController : ControllerBase
         identity.AddClaim(new Claim(OpenIddictConstants.Claims.Email, user.Email).SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
         identity.AddClaim(new Claim(OpenIddictConstants.Claims.Name, user.UserName).SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
         identity.SetScopes(new[] {
-     OpenIddictConstants.Scopes.OpenId,
-     OpenIddictConstants.Scopes.Email,
-     OpenIddictConstants.Scopes.Profile,
-     OpenIddictConstants.Scopes.OfflineAccess
- });
-
-
-
+                            OpenIddictConstants.Scopes.OpenId,
+                            OpenIddictConstants.Scopes.Email,
+                            OpenIddictConstants.Scopes.Profile,
+                            OpenIddictConstants.Scopes.OfflineAccess});
+        identity.SetAudiences(new[] { "audiences" });
         return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
