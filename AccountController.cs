@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -44,9 +45,11 @@ public class AccountController : ControllerBase
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (!result.Succeeded)
-            // return BadRequest(result.Errors);
+            return BadRequest(result.Errors);
 
-            // Gán role mặc định
+        // user = await _userManager.FindByEmailAsync(model.Email);
+
+        // Gán role mặc định
         await _userManager.AddToRoleAsync(user, "User");
 
         // ✅ Tạo token xác thực email
@@ -107,14 +110,25 @@ public class AccountController : ControllerBase
     }
 
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest model)
+    [HttpPost("~/connect/token")]
+    public async Task<IActionResult> Exchange()
     {
-        var user = await _userManager.FindByEmailAsync(model.Email);
-        if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
-            return Unauthorized("Invalid email or password");
+        var request = HttpContext.GetOpenIddictServerRequest();
+        if (request is null || request.GrantType != OpenIddictConstants.GrantTypes.Password)
+            return BadRequest(new { error = "unsupported_grant_type" });
 
-        var identity = new ClaimsIdentity(TokenValidationParameters.DefaultAuthenticationType);
+        var user = await _userManager.FindByEmailAsync(request.Username);
+        if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
+            return Unauthorized("Sai email hoặc mật khẩu.");
+
+        if (!user.EmailConfirmed)
+            return Unauthorized("chưa xác thực email");
+
+        var identity = new ClaimsIdentity(
+            OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+            OpenIddictConstants.Claims.Name,
+            OpenIddictConstants.Claims.Role);
+
         identity.AddClaim(OpenIddictConstants.Claims.Subject, user.Id);
         identity.AddClaim(OpenIddictConstants.Claims.Email, user.Email);
         identity.AddClaim(OpenIddictConstants.Claims.Name, user.UserName);
@@ -124,12 +138,11 @@ public class AccountController : ControllerBase
             identity.AddClaim(OpenIddictConstants.Claims.Role, role);
 
         var principal = new ClaimsPrincipal(identity);
-        principal.SetScopes(OpenIddictConstants.Scopes.OpenId, OpenIddictConstants.Scopes.Email, OpenIddictConstants.Scopes.Roles);
+        principal.SetScopes(request.GetScopes());
+        principal.SetResources("resource_server");
 
-        // 👇 Đây là cách OpenIddict tạo và trả token
         return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
-
 
     [Authorize]
     [HttpPost("change-password")]

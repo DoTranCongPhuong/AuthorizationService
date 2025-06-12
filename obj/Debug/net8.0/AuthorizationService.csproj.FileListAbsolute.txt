@@ -13,7 +13,6 @@ C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
-C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Microsoft.Bcl.Memory.dll
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
@@ -123,11 +122,6 @@ C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\AuthorizationService.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets.development.json
-C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets\msbuild.AuthorizationService.Microsoft.AspNetCore.StaticWebAssets.props
-C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets\msbuild.build.AuthorizationService.props
-C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.AuthorizationService.props
-C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.AuthorizationService.props
-C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets.pack.json
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\scopedcss\bundle\AuthorizationService.styles.css
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\Authoriz.ECDF2498.Up2Date
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\AuthorizationService.dll
@@ -217,3 +211,11 @@ C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+c:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\AuthorizationService.sourcelink.json
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\AuthorizationService.staticwebassets.endpoints.json
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets.build.endpoints.json

@@ -2,6 +2,7 @@ using AuthorizationService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
+using OpenIddict.Server;
 using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
 // using AuthorizationService.Data;
@@ -36,27 +37,38 @@ builder.Services.AddOpenIddict()
     .AddCore(options =>
     {
         options.UseEntityFrameworkCore()
-               .UseDbContext<ApplicationDbContext>();
+               .UseDbContext<ApplicationDbContext>(); // ✅ kết nối EF Core
     })
     .AddServer(options =>
     {
-        options.SetTokenEndpointUris("/connect/token");
+        options.SetTokenEndpointUris("/connect/token"); // ✅ endpoint token
 
-        options.AllowPasswordFlow();
-        options.AllowRefreshTokenFlow();
-        options.AcceptAnonymousClients();
+        options.AllowPasswordFlow();          // ✅ cho phép password flow
+        options.AllowRefreshTokenFlow();      // ✅ cho phép refresh token
+        options.AcceptAnonymousClients();     // ✅ client không cần xác thực
 
-        options.AddEphemeralEncryptionKey()
-               .AddEphemeralSigningKey();
+        // ✅ KHÔNG có AddEphemeralEncryptionKey() => Token KHÔNG bị mã hóa => JWS
+        options.AddEphemeralSigningKey();     // ✅ Dùng khóa ký tạm thời
 
         options.UseAspNetCore()
-               .EnableTokenEndpointPassthrough();
+               .EnableTokenEndpointPassthrough(); // ✅ cho phép dùng controller tuỳ chỉnh
     })
     .AddValidation(options =>
     {
         options.UseLocalServer();
         options.UseAspNetCore();
     });
+
+// ✅ Set cứng: Cho phép HTTP mà không cần kiểm tra môi trường
+builder.Services.Configure<OpenIddictServerAspNetCoreOptions>(options =>
+{
+    options.DisableTransportSecurityRequirement = true;
+}
+);
+
+
+
+
 var emailSettings = builder.Configuration
     .GetSection("EmailSettings")
     .Get<EmailSettings>();
@@ -105,11 +117,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); - http
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();
