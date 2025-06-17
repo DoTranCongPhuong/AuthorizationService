@@ -219,3 +219,10 @@ C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets.build.json.cache
 C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Google.Protobuf.dll
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Grpc.AspNetCore.Server.dll
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Grpc.AspNetCore.Server.ClientFactory.dll
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Grpc.Core.Api.dll
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Grpc.Net.Client.dll
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Grpc.Net.ClientFactory.dll
+C:\Users\acer\Desktop\THLOne\MicroserviceDemo\AuthorizationService\bin\Debug\net8.0\Grpc.Net.Common.dll

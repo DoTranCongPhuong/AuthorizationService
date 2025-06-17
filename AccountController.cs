@@ -47,7 +47,7 @@ public class AccountController : ControllerBase
         if (!result.Succeeded)
             return BadRequest(result.Errors);
 
-        // user = await _userManager.FindByEmailAsync(model.Email);
+        user = await _userManager.FindByEmailAsync(model.Email);
 
         // Gán role mặc định
         await _userManager.AddToRoleAsync(user, "User");
@@ -110,7 +110,7 @@ public class AccountController : ControllerBase
     }
 
 
-    [HttpPost("~/connect/token")]
+    [HttpPost("/connect/token")]
     public async Task<IActionResult> Exchange()
     {
         var request = HttpContext.GetOpenIddictServerRequest();
@@ -124,42 +124,48 @@ public class AccountController : ControllerBase
         if (!user.EmailConfirmed)
             return Unauthorized("chưa xác thực email");
 
-        // var identity = new ClaimsIdentity(
-        //     OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-        //     OpenIddictConstants.Claims.Name,
-        //     OpenIddictConstants.Claims.Role);
-
-        // identity.AddClaim(OpenIddictConstants.Claims.Subject, user.Id);
-        // identity.AddClaim(OpenIddictConstants.Claims.Email, user.Email);
-        // identity.AddClaim(OpenIddictConstants.Claims.Name, user.UserName);
-
-        // var roles = await _userManager.GetRolesAsync(user);
-        // foreach (var role in roles)
-        //     identity.AddClaim(OpenIddictConstants.Claims.Role, role);
-
-        // var principal = new ClaimsPrincipal(identity);
-        // principal.SetScopes(request.GetScopes());
-        // principal.SetResources("resource_server");
         var principal = await _signInManager.CreateUserPrincipalAsync(user);
         var identity = (ClaimsIdentity)principal.Identity!;
-        identity.AddClaim(new Claim(OpenIddictConstants.Claims.Subject, user.Id).SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
 
-        identity.AddClaim(new Claim(OpenIddictConstants.Claims.Email, user.Email).SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
-        identity.AddClaim(new Claim(OpenIddictConstants.Claims.Name, user.UserName).SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
-        identity.SetScopes(new[] {
-                            OpenIddictConstants.Scopes.OpenId,
-                            OpenIddictConstants.Scopes.Email,
-                            OpenIddictConstants.Scopes.Profile,
-                            OpenIddictConstants.Scopes.OfflineAccess});
-        identity.SetAudiences(new[] { "audiences" });
+        // Add standard claims
+        identity.AddClaim(new Claim(OpenIddictConstants.Claims.Subject, user.Id)
+            .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+
+        identity.AddClaim(new Claim(OpenIddictConstants.Claims.Email, user.Email)
+            .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+
+        identity.AddClaim(new Claim(OpenIddictConstants.Claims.Name, user.UserName)
+            .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+
+        // Add role claims
+        var roles = await _userManager.GetRolesAsync(user);
+        foreach (var role in roles)
+        {
+            identity.AddClaim(new Claim(ClaimTypes.Role, role)
+                .SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken));
+        }
+
+        identity.SetScopes(new[]
+        {
+        OpenIddictConstants.Scopes.OpenId,
+        OpenIddictConstants.Scopes.Email,
+        OpenIddictConstants.Scopes.Profile,
+        OpenIddictConstants.Scopes.OfflineAccess
+    });
+
+        identity.SetAudiences(new[] { "masterdata-api" });
+
         return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
+
 
     [Authorize]
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest model)
     {
-        var user = await _userManager.GetUserAsync(User);
+        var userId = User.FindFirstValue("sub"); // hoặc ClaimTypes.NameIdentifier nếu đã ánh xạ
+        var user = await _userManager.FindByIdAsync(userId);
+        // var user = await _userManager.GetUserAsync(User);
         if (user == null)
             return Unauthorized();
 

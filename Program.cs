@@ -6,6 +6,9 @@ using OpenIddict.Abstractions;
 using OpenIddict.Server;
 using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
+using Grpc.AspNetCore;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+
 // using AuthorizationService.Data;
 // using AuthorizationService.Models;
 
@@ -34,133 +37,72 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddDefaultTokenProviders();
 
 // ---------- OPENIDDICT CONFIGURATION ----------
-// builder.Services.AddOpenIddict()
-//     .AddCore(options =>
-//     {
-//         options.UseEntityFrameworkCore()
-//                .UseDbContext<ApplicationDbContext>();
-//     })
-//     .AddServer(options =>
-//     {
+builder.Services.AddOpenIddict()
+    .AddCore(options =>
+    {
+        options.UseEntityFrameworkCore()
+               .UseDbContext<ApplicationDbContext>();
+    })
+    .AddServer(opt =>
+    {
 
-//         options.AddEphemeralEncryptionKey();
+        opt.SetTokenEndpointUris("/connect/token");
+        opt.SetAuthorizationEndpointUris("/connect/authorize");
+        opt.SetUserInfoEndpointUris("/connect/userinfo");
 
-//         // ✅ Dùng khóa ký JWT
-//         options.AddDevelopmentSigningCertificate();
-//         options.DisableAccessTokenEncryption();
-//         options.SetTokenEndpointUris("/connect/token");
-//         options.AllowPasswordFlow();
-//         options.AllowRefreshTokenFlow();
-//         options.AcceptAnonymousClients();
+        opt.AllowPasswordFlow().AllowRefreshTokenFlow();
 
-//         options.UseAspNetCore()
-//                .EnableTokenEndpointPassthrough();
-//     })
-//     .AddValidation(options =>
-//     {
-//         options.UseLocalServer();
-//         options.UseAspNetCore();
-//     });
+        opt.AllowClientCredentialsFlow();
+
+        opt.AcceptAnonymousClients();
+
+        opt.DisableAccessTokenEncryption();
+
+        opt.AddDevelopmentEncryptionCertificate().AddDevelopmentSigningCertificate();
+
+        opt.UseAspNetCore().EnableTokenEndpointPassthrough().EnableAuthorizationEndpointPassthrough().EnableUserInfoEndpointPassthrough();
+    })
+    .AddValidation(options =>
+    {
+        options.AddAudiences("audiences");
+        options.SetIssuer("https://localhost:5048");
+        //options.UseSystemNetHttp();
+        options.UseLocalServer();
+        options.UseAspNetCore();
+    });
 
 
-
-
-
-// --------------------- Cho phép HTTP (chỉ dùng khi phát triển) ---------------------
+    // --------------------- Cho phép HTTP (chỉ dùng khi phát triển) ---------------------
 builder.Services.Configure<OpenIddictServerAspNetCoreOptions>(options =>
 {
     // Tắt bắt buộc HTTPS để dễ test local (KHÔNG dùng trong production)
     options.DisableTransportSecurityRequirement = true;
 });
 
-// --------------------- Cấu hình OpenIddict ---------------------
-builder.Services.AddOpenIddict()
-
-    // ---------- Core Layer: sử dụng Entity Framework để lưu trữ ứng dụng, token, v.v. ----------
-    .AddCore(options =>
-    {
-        options.UseEntityFrameworkCore()
-               .UseDbContext<ApplicationDbContext>();
-    })
-
-    // ---------- Server Layer: nơi phát hành token và xử lý xác thực ----------
-    .AddServer(options =>
-    {
-        // Cấu hình các endpoint được hỗ trợ
-        options.SetTokenEndpointUris("/connect/token");
-        options.SetAuthorizationEndpointUris("/connect/authorize");
-        options.SetUserInfoEndpointUris("/connect/userinfo");
-
-        // Cho phép các flow phổ biến (đăng nhập, client credentials, refresh token)
-        options.AllowPasswordFlow()
-               .AllowRefreshTokenFlow()
-               .AllowClientCredentialsFlow();
-
-        // Chấp nhận ứng dụng không có client_id (anonymous client - không an toàn với prod)
-        options.AcceptAnonymousClients();
-
-        // Không mã hóa access token (JWT ở dạng plain)
-        options.DisableAccessTokenEncryption();
-
-        // Dùng chứng chỉ tạm thời để ký và mã hóa token (chỉ dùng khi dev)
-        options.AddDevelopmentEncryptionCertificate()
-               .AddDevelopmentSigningCertificate();
-
-        // Kích hoạt tích hợp với ASP.NET Core cho các endpoint
-        options.UseAspNetCore()
-               .EnableTokenEndpointPassthrough()
-               .EnableAuthorizationEndpointPassthrough()
-               .EnableUserInfoEndpointPassthrough();
-    })
-
-    // ---------- Validation Layer: xác thực access token gửi từ client ----------
-    .AddValidation(options =>
-    {
-        // Token phải chứa audience này (tuỳ chỉnh theo hệ thống của bạn)
-        options.AddAudiences("audiences");
-
-        // Token phải phát hành từ issuer này
-        options.SetIssuer("https://localhost:5048");
-
-        // options.UseSystemNetHttp(); // Tuỳ chọn dùng HttpClient chuẩn (nếu cần)
-
-        // Xác thực token bằng chính server local này
-        options.UseLocalServer();
-
-        // Dùng tích hợp sẵn với ASP.NET Core
-        options.UseAspNetCore();
-    });
-
-// --------------------- Cấu hình xác thực (Authentication) ---------------------
+// ---------- AUTHENTICATION ----------
 builder.Services.AddAuthentication(options =>
 {
-    // Sử dụng validation scheme mặc định của OpenIddict
     options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 });
 
-// --------------------- Cấu hình phân quyền (Authorization) ---------------------
+// ---------- AUTHORIZATION ----------
 builder.Services.AddAuthorization();
 
 builder.Services.AddAuthorization(options =>
 {
-    // Mặc định: người dùng phải được xác thực để truy cập mọi endpoint
     options.DefaultPolicy = new AuthorizationPolicyBuilder()
         .AddAuthenticationSchemes(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)
         .RequireAuthenticatedUser()
         .Build();
 });
 
-// --------------------- Tùy chỉnh phản hồi khi bị từ chối hoặc chưa đăng nhập (401/403) ---------------------
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // Trả về 401 thay vì redirect khi chưa đăng nhập (API friendly)
     options.Events.OnRedirectToLogin = context =>
     {
         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
         return Task.CompletedTask;
     };
-
-    // Trả về 403 khi bị từ chối truy cập
     options.Events.OnRedirectToAccessDenied = context =>
     {
         context.Response.StatusCode = StatusCodes.Status403Forbidden;
@@ -185,10 +127,25 @@ builder.Services.AddAuthentication(options =>
 // ---------- AUTHORIZATION ----------
 builder.Services.AddAuthorization();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    // Cổng cho HTTP API
+    options.ListenLocalhost(5048, listenOptions =>
+    {
+        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+    });
+    options.ListenLocalhost(5049, listenOptions =>
+    {
+        listenOptions.Protocols = HttpProtocols.Http2;
+    });
+});
+
 // ---------- CONTROLLERS / SWAGGER ----------
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 
@@ -201,7 +158,7 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { "User", "Admin" };
+    string[] roles = {"User"};
 
     foreach (var role in roles)
     {
@@ -221,8 +178,8 @@ if (app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection(); - http
 
+app.MapGrpcService<AccountGrpcService>();
 
 app.MapControllers();
-
 
 app.Run();

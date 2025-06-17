@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "Authorization.Grpc";
+
+service AccountGrpc {
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message CreateUserResponse {
+  string user_id = 1;
+  string message = 2;
+}
